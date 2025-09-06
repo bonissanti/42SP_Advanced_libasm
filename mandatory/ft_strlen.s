@@ -18,17 +18,17 @@ exit:
     syscall
 
 ft_strlen:
-    push    ebp
+    PUSH    rbp
     mov     ebp, esp
 
-    push    ecx
+    PUSH    rcx
     dec     ecx
 .loop       inc ecx
     cmp     byte [ecx], 0
     jne     .loop
     sub     ecx, [esp]
     mov     [len], ecx  ;save length
-    pop     ecx
+    POP     rcx
     ret
 
 section .bss
