@@ -5,9 +5,9 @@ ft_strcmp:
     xor rax, rax
 
     test rdi, rdi
-    jz .done
+    jz .error
     test rsi, rsi
-    jz .done
+    jz .error
 
   .loop:
     mov cl, byte [rdi + rax]
@@ -31,5 +31,5 @@ ft_strcmp:
     xor rax, rax
     ret
 
-  .done:
+  .error:
     ret
