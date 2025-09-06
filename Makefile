@@ -8,7 +8,7 @@ OBJ_DIR_BONUS		= mandatory/bonus
 
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
-	FLAGS += -g
+	FLAGS += -g -F dwarf
 endif
 
 SRC_FILES_MANDATORY		= $(wildcard $(SRC_DIR_MANDATORY)/*.s)
@@ -24,7 +24,7 @@ $(OBJ_DIR_MANDATORY)/%.o: $(SRC_DIR_MANDATORY)/%.s
 	$(NASM) $(FLAGS) $< -o $@
 
 clean:
-	rm -rf program $(OBJ_DIR_MANDATORY)
+	rm -rf $(OBJ_DIR_MANDATORY)
 
 fclean: clean
 	rm -rf program
