@@ -16,6 +16,8 @@ OBJ_FILES_MANDATORY		= $(patsubst $(SRC_DIR_MANDATORY)/%.s, $(OBJ_DIR_MANDATORY)
 
 all: program
 
+re: fclean all
+
 program: $(OBJ_FILES_MANDATORY)
 	ld -o program $(OBJ_FILES_MANDATORY)
 
@@ -29,4 +31,4 @@ clean:
 fclean: clean
 	rm -rf program
 
-.PHONY: all program clean fclean
+.PHONY: all re program clean fclean

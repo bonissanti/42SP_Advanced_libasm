@@ -3,32 +3,32 @@ text:   db "Hello World!", 0
 
 section .text
     global _start
+    global ft_strlen
 
 _start:
-    mov     ebx, 1      ;file descriptor (stdout)
-    mov     eax, 1      ;system call number (sys_write | 64bit linux)
-    mov     ecx, text    ;message to write
+    mov     rdi, text
     call    ft_strlen
-    mov     edx, [len]    ;len of string to print
-    syscall         ;call for linux (x86_64 arch) execute code
+    mov     rdx, rax
+
+    mov     rax, 1      ;sys_write syscall number (linux x64)
+    mov     rdi, 1      ;file descriptor (stdout)
+    mov     rsi, rdx    ;message to write
+    syscall
 
 exit:
-    mov     eax, 1      ;system call number (sys exit)
-    mov     ebx, 0      ;fd to read-only
+    mov     rax, 60     ;sys_exit syscall number (linux x64)
+    mov     rdi, 0      ;exit status
     syscall
 
 ft_strlen:
-    PUSH    rbp
-    mov     ebp, esp
+    xor rax, rax
+ .loop:
+    cmp byte [rdi + rax], 0
+    je .done
+    inc rax
+    jmp .loop
 
-    PUSH    rcx
-    dec     ecx
-.loop       inc ecx
-    cmp     byte [ecx], 0
-    jne     .loop
-    sub     ecx, [esp]
-    mov     [len], ecx  ;save length
-    POP     rcx
+ .done:
     ret
 
 section .bss
