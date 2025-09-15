@@ -10,6 +10,7 @@ extern int ft_strcmp(const char *s1, const char *s2);
 extern char *ft_strcpy(const char *dest, const char *src);
 extern ssize_t ft_write(int fd, const void *buffer, size_t count);
 extern ssize_t ft_read(int fd, const void *buffer, size_t count);
+extern char *ft_strdup(const char *src);
 
 int main(void)
 {
@@ -96,7 +97,20 @@ int main(void)
         printf("Bytes read from original read() function: %ld\n", bytes_read);
 
         ssize_t bytes_read2 = ft_read(fd, str, sizeof(str));
-        printf("Bytes read from ft_read() function: %ld\n", bytes_read2);
+        printf("Bytes read from ft_read() function: %ld\n\n", bytes_read2);
+        //TODO: add errrno validation
+        close(fd);
+    }
+    {
+        puts("######## FT_STRDUP TESTS ########");
+
+        const char *src = "Teste a ser duplicado";
+        char *dest = "";
+
+        dest = ft_strdup(src);
+
+        printf("Src is: %s and dest is: %s", src, dest);
+
     }
     return 0;
 }
