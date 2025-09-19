@@ -6,6 +6,7 @@ extern  ft_strlen
 extern  ft_strcpy
 
 ft_strdup:
+    push rdi
     mov rdi, rdi
     call ft_strlen
     inc rax
@@ -16,13 +17,11 @@ ft_strdup:
     test rax, rax
     je .error
 
-    mov rbx, rax
-
-    mov rdi, rbx
-    mov rsi, rsi
+    mov rdi, rax
     call ft_strcpy
 
-    mov rdi, 0
+    mov rsi, rax
+    pop rsi
     ret
 
  .error:
