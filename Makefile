@@ -2,11 +2,14 @@ NASM 				= nasm
 CC					= cc
 NASM_FLAGS 			= -f elf64
 CFLAGS				= -Wall -Werror -Wextra
+TEST_CFLAGS			= $(CFLAGS) -lcriterion
 
-SRC_DIR_MANDATORY 	= mandatory
-SRC_DIR_BONUS		= bonus
-OBJ_DIR_MANDATORY	= mandatory/obj
-OBJ_DIR_BONUS		= mandatory/bonus
+SRC_DIR_MANDATORY 		= mandatory
+SRC_DIR_BONUS			= bonus
+TEST_DIR_MANDATORY		= mandatory/tests
+TEST_OBJ_DIR_MANDATORY	= mandatory/test_obj
+OBJ_DIR_MANDATORY		= mandatory/obj
+OBJ_DIR_BONUS			= mandatory/bonus
 
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
@@ -16,8 +19,12 @@ endif
 
 ASM_SRC_FILES_MANDATORY		= $(wildcard $(SRC_DIR_MANDATORY)/*.s)
 ASM_OBJ_FILES_MANDATORY		= $(patsubst $(SRC_DIR_MANDATORY)/%.s, $(OBJ_DIR_MANDATORY)/%.o, $(ASM_SRC_FILES_MANDATORY))
-C_SRC_FILES_MANDATORY	= $(wildcard $(SRC_DIR_MANDATORY)/*.c)
-C_OBJ_FILES_MANDATORY	= $(patsubst $(SRC_DIR_MANDATORY)/%.c, $(OBJ_DIR_MANDATORY)/%.o, $(C_SRC_FILES_MANDATORY))
+C_SRC_FILES_MANDATORY		= $(wildcard $(SRC_DIR_MANDATORY)/*.c)
+C_OBJ_FILES_MANDATORY		= $(patsubst $(SRC_DIR_MANDATORY)/%.c, $(OBJ_DIR_MANDATORY)/%.o, $(C_SRC_FILES_MANDATORY))
+TEST_SRC_FILES_MANDATORY	= $(wildcard $(TEST_DIR_MANDATORY)/*.c)
+TEST_OBJ_FILES_MANDATORY	= $(patsubst $(TEST_DIR_MANDATORY)/*.c, $(TEST_OBJ_DIR_MANDATORY)/%.o, $(TEST_SRC_FILES_MANDATORY))
+
+ASM_OBJ_FILES_FOR_TESTS	= $(filter-out $(OBJ_DIR_MANDATORY)/main.o, $(ASM_OBJ_FILES_MANDATORY))
 OBJ_FILES_MANDATORY 	= $(ASM_OBJ_FILES_MANDATORY) $(C_OBJ_FILES_MANDATORY)
 
 all: program
@@ -25,20 +32,34 @@ all: program
 re: fclean all
 
 program: $(OBJ_FILES_MANDATORY)
-	$(CC) -o program $(OBJ_FILES_MANDATORY)
+	@echo "Generating bin..."
+	@$(CC) -o program $(OBJ_FILES_MANDATORY)
+
+test: $(TEST_OBJ_FILES_MANDATORY) $(ASM_OBJ_FILES_FOR_TESTS)
+	@echo "Generating bin test..."
+	@$(CC) -o test_runner $(TEST_OBJ_FILES_MANDATORY) $(ASM_OBJ_FILES_FOR_TESTS) $(TEST_CFLAGS)
+	@./test_runner
 
 $(OBJ_DIR_MANDATORY)/%.o: $(SRC_DIR_MANDATORY)/%.s
-	mkdir -p $(OBJ_DIR_MANDATORY)
-	$(NASM) $(NASM_FLAGS) $< -o $@
+	@echo "Compiling assembly files..."
+	@mkdir -p $(OBJ_DIR_MANDATORY)
+	@$(NASM) $(NASM_FLAGS) $< -o $@
 
 $(OBJ_DIR_MANDATORY)/%.o: $(SRC_DIR_MANDATORY)/%.c
-	mkdir -p $(OBJ_DIR_MANDATORY)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Compiling C files..."
+	@mkdir -p $(OBJ_DIR_MANDATORY)
+	@$(CC) $(CFLAGS) -c $< -o $@
+
+$(TEST_OBJ_DIR_MANDATORY)/%.o: $(TEST_DIR_MANDATORY)/%.c
+	@mkdir -p $(TEST_OBJ_DIR_MANDATORY)
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(OBJ_DIR_MANDATORY)
+	@echo "Deleting files..."
+	@rm -rf $(OBJ_DIR_MANDATORY) $(TEST_OBJ_DIR_MANDATORY)
 
 fclean: clean
-	rm -rf program
+	@echo "Deleting bin files..."
+	@rm -rf program test_runner
 
-.PHONY: all re clean fclean
+.PHONY: all re clean fclean test

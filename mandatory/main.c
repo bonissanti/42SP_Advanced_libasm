@@ -98,7 +98,7 @@ int main(void)
 
         ssize_t bytes_read2 = ft_read(fd, str, sizeof(str));
         printf("Bytes read from ft_read() function: %ld\n\n", bytes_read2);
-        //TODO: add errrno validation
+        //TODO: add errno validation
         close(fd);
     }
     {
@@ -110,6 +110,7 @@ int main(void)
         dest = ft_strdup(src);
 
         printf("Src is: %s and dest is: %s", src, dest);
+
 
     }
     return 0;
