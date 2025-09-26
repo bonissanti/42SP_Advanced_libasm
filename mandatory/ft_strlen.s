@@ -7,7 +7,7 @@ ft_strlen:
     jz .is_null
     jmp .loop
 
- .is_null
+ .is_null:
     ret
  .loop:
     cmp byte [rdi + rax], 0

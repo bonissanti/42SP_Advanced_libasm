@@ -10,17 +10,17 @@ ft_strcpy:
     jz      .error
 
  .loop:
-    movzx   rdx, byte [rsi + rcx]
-    mov     [rdi + rcx], dl
-    test    dl, dl
+    movzx   rdx, byte [rsi + rcx]   ; load
+    mov     [rdi + rcx], dl         ; process
+    test    dl, dl                  ; test
     je      .exit
     inc     rcx
     jmp     .loop
 
- .exit
+ .exit:
     mov     rax, rdi
     ret
 
- .error
+ .error:
     xor rax, rax
     ret

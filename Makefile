@@ -1,8 +1,8 @@
 NASM 				= nasm
 CC					= cc
-NASM_FLAGS 			= -f elf64
+NASM_FLAGS 			= -f elf64 -g
 CFLAGS				= -Wall -Werror -Wextra
-TEST_CFLAGS			= $(CFLAGS) -lcriterion
+TEST_CFLAGS			= $(CFLAGS) -g3 -lcriterion
 
 SRC_DIR_MANDATORY 		= mandatory
 SRC_DIR_BONUS			= bonus
