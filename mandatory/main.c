@@ -14,17 +14,14 @@ extern char *ft_strdup(const char *src);
 int main(void)
 {
     {
-        puts("######## FT_STRCPY TESTS ########");
-        char dest2[20] = "";
-        char src2[100] = "Hello, World!";
-        char *result = strcpy(dest2, src2);
+        puts("######## FT_STRDUP TESTS ########");
 
-        char dest[20] = "";
-        char src[100] = "Hello, World!";
-        char *result1 = ft_strcpy(dest, src);
+        const char *src = "Teste a ser duplicado";
+        char *dest = "";
 
-        printf("ft_strcpy: %s\n", result1);
-        printf("strcpy: %s\n", result);
+        dest = ft_strdup(src);
+
+        printf("Src is: %s and dest is: %s", src, dest);
     }
     return 0;
 }
