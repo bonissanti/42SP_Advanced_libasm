@@ -23,7 +23,7 @@ print_status()
 
 print_test()
 {
-    echo -e "${YELLOW}}🧪 Testing: $1${RESET}"
+    echo -e "${YELLOW}🧪 Testing: $1${RESET}"
 }
 
 echo -e "${YELLOW} === Cleaning Workspace ===${RESET}"
@@ -61,3 +61,56 @@ else
     print_status 1 "Binary '$BINARY_NAME' still exists after fclean"
     exit 1
 fi
+
+# TEST 3: make re - Rebuild
+print_test "make re"
+make re > /dev/null 2>&1
+
+if [ -f "$BINARY_NAME" ]; then
+    print_status 0  "Binary '$BINARY_NAME' rebuilt successfully"
+else
+    print_status 1 "Binary '$BINARY_NAME' not found after make re"
+    exit 1
+fi
+
+# TEST 4: make - Nothing to be done
+print_test "make (nothing to be done)"
+make_output=$(make 2>&1) # TODO: redirect to file?
+make_exit_code=$?
+
+# Verify if relinked
+if echo "$make_output" | grep -q "Nothing to be done for 'all'\|up to date"; then
+    print_status 0  "Make correctly detected no changes needed"
+else
+    print_status 1 "Make unnecessarily rebuilt files"
+    echo "Make output: $make_output"
+    exit 1
+fi
+
+# TEST 5: make test - criterion tester
+if grep -q "test:" Makefile 2>/dev/null; then
+    print_test "make test"
+    make test > test_output.log 2>&1
+    test_exit_code=$?
+
+    if [ $test_exit_code -eq 0 ]; then
+        print_status 0 "Tests passed"
+    else
+        print_status 1 "Tests failed"
+        echo "Test output:"
+        cat test_output.log
+        exit 1
+    fi
+else
+    echo -e "${YELLOW}⚠ No 'test' target found in Makefile${RESET}"
+fi
+
+# TODO: TEST 6: library exists
+
+echo -e "${GREEN} === All tests passed! ===${RESET}"
+
+make fclean
+rm -f make_output.log test_output.log
+
+exit 0
+
