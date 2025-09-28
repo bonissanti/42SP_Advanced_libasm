@@ -5,7 +5,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RESET='\033[0m'
 
-BINARY_NAME="program"
+LIBRARY_NAME="program"
 OBJ_MANDATORY_DIR="mandatory/obj"
 OBJ_MANDATORY_DIR="bonus/obj"
 TEST_BINARY="test_runner"
@@ -41,10 +41,10 @@ if [ $make_exit_code -ne 0 ]; then
 fi
 
 # Verify if binary exists
-if [ -f "$BINARY_NAME" ]; then
-    print_status 0 "Binary '$BINARY_NAME' created successfully"
+if [ -f "$LIBRARY_NAME" ]; then
+    print_status 0 "Binary '$LIBRARY_NAME' created successfully"
 else
-    print_status 1 "Binary '$BINARY_NAME' not found after make"
+    print_status 1 "Binary '$LIBRARY_NAME' not found after make"
     echo "Files created: "
     ls -la
     exit 1
@@ -55,10 +55,10 @@ print_test "make fclean"
 make fclean > /dev/null 2>&1
 
 # Verify if binary was removed
-if [ ! -f "$BINARY_NAME" ]; then
-    print_status 0 "Binary '$BINARY_NAME' removed"
+if [ ! -f "$LIBRARY_NAME" ]; then
+    print_status 0 "Binary '$LIBRARY_NAME' removed"
 else
-    print_status 1 "Binary '$BINARY_NAME' still exists after fclean"
+    print_status 1 "Binary '$LIBRARY_NAME' still exists after fclean"
     exit 1
 fi
 
@@ -66,10 +66,10 @@ fi
 print_test "make re"
 make re > /dev/null 2>&1
 
-if [ -f "$BINARY_NAME" ]; then
-    print_status 0  "Binary '$BINARY_NAME' rebuilt successfully"
+if [ -f "$LIBRARY_NAME" ]; then
+    print_status 0  "Binary '$LIBRARY_NAME' rebuilt successfully"
 else
-    print_status 1 "Binary '$BINARY_NAME' not found after make re"
+    print_status 1 "Binary '$LIBRARY_NAME' not found after make re"
     exit 1
 fi
 
