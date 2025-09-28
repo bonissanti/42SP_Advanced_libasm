@@ -9,7 +9,7 @@ SRC_DIR_BONUS			= bonus
 TEST_DIR_MANDATORY		= mandatory/tests
 TEST_OBJ_DIR_MANDATORY	= mandatory/test_obj
 OBJ_DIR_MANDATORY		= mandatory/obj
-OBJ_DIR_BONUS			= mandatory/bonus
+OBJ_DIR_BONUS			= bonus/obj
 
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
