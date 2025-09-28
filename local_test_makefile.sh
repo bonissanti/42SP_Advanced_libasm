@@ -50,7 +50,7 @@ else
     exit 1
 fi
 
-# TEST2: make fclean
+# TEST 2: make fclean
 print_test "make fclean"
 make fclean > /dev/null 2>&1
 
