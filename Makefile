@@ -1,7 +1,8 @@
+NAME				= libasm.a
 NASM 				= nasm
 CC					= cc
 NASM_FLAGS 			= -f elf64 -g
-CFLAGS				= -Wall -Werror -Wextra
+CFLAGS				= -Wall -Werror -Wextra -I./mandatory
 TEST_CFLAGS			= $(CFLAGS) -g3 -lcriterion
 
 SRC_DIR_MANDATORY 		= mandatory
@@ -9,7 +10,7 @@ SRC_DIR_BONUS			= bonus
 TEST_DIR_MANDATORY		= mandatory/tests
 TEST_OBJ_DIR_MANDATORY	= mandatory/test_obj
 OBJ_DIR_MANDATORY		= mandatory/obj
-OBJ_DIR_BONUS			= mandatory/bonus
+OBJ_DIR_BONUS			= bonus/obj
 
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
@@ -27,13 +28,13 @@ TEST_OBJ_FILES_MANDATORY	= $(patsubst $(TEST_DIR_MANDATORY)/*.c, $(TEST_OBJ_DIR_
 ASM_OBJ_FILES_FOR_TESTS	= $(filter-out $(OBJ_DIR_MANDATORY)/main.o, $(ASM_OBJ_FILES_MANDATORY))
 OBJ_FILES_MANDATORY 	= $(ASM_OBJ_FILES_MANDATORY) $(C_OBJ_FILES_MANDATORY)
 
-all: program
+all: $(NAME)
 
 re: fclean all
 
-program: $(OBJ_FILES_MANDATORY)
+$(NAME): $(OBJ_FILES_MANDATORY)
 	@echo "Generating bin..."
-	@$(CC) -o program $(OBJ_FILES_MANDATORY)
+	@ar rcs $@ $(OBJ_FILES_MANDATORY)
 
 test: $(TEST_OBJ_FILES_MANDATORY) $(ASM_OBJ_FILES_FOR_TESTS)
 	@echo "Generating bin test..."
@@ -60,6 +61,6 @@ clean:
 
 fclean: clean
 	@echo "Deleting bin files..."
-	@rm -rf program test_runner
+	@rm -rf $(NAME) test_runner
 
 .PHONY: all re clean fclean test
