@@ -18,9 +18,9 @@ teamcity_test_failed()
 }
 
 # Clean workspace
-echo "##teamcity[blockOpened name='Cleanup'"
+echo "##teamcity[blockOpened name='Cleanup']"
 make fclean > /dev/null 2>&1
-echo "##teamcity[blockClosed name='Cleanup'"
+echo "##teamcity[blockClosed name='Cleanup']"
 
 # Test 1: Initial build
 teamcity_started "make_build"
