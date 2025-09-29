@@ -48,13 +48,13 @@ eteamcity_test_started() {
      exit 1
  fi
 
- if [ ! -f "$BINARY_NAME" ]; then
-     teamcity_test_failed "make_build" "Binary '$BINARY_NAME' not created"
+ if [ ! -f "$LIBRARY_NAME" ]; then
+     teamcity_test_failed "make_build" "Binary '$LIBRARY_NAME' not created"
      ls -la
      exit 1
  fi
 
- echo "Binary created successfully: $BINARY_NAME"
+ echo "Binary created successfully: $LIBRARY_NAME"
  echo "##teamcity[blockClosed name='Initial Build']"
  teamcity_test_finished "make_build"
 
@@ -64,8 +64,8 @@ eteamcity_test_started() {
 
  make fclean > /dev/null 2>&1
 
- if [ -f "$BINARY_NAME" ]; then
-     teamcity_test_failed "make_fclean" "Binary '$BINARY_NAME' not removed after fclean"
+ if [ -f "$LIBRARY_NAME" ]; then
+     teamcity_test_failed "make_fclean" "Binary '$LIBRARY_NAME' not removed after fclean"
      exit 1
  fi
 
@@ -85,8 +85,8 @@ eteamcity_test_started() {
 
  make re > /dev/null 2>&1
 
- if [ ! -f "$BINARY_NAME" ]; then
-     teamcity_test_failed "make_re" "Binary '$BINARY_NAME' not created after make re"
+ if [ ! -f "$LIBRARY_NAME" ]; then
+     teamcity_test_failed "make_re" "Binary '$LIBRARY_NAME' not created after make re"
      exit 1
  fi
 
