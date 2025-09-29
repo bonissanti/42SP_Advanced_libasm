@@ -21,7 +21,7 @@ ft_strdup:
     je .error_pop
 
     mov rdi, rax
-    pop rsi    
+    pop rsi
     push rax
     call ft_strcpy
     pop rax
