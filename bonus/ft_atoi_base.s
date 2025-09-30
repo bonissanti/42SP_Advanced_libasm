@@ -45,3 +45,20 @@ ft_is_hexdigit:
     mov rax, 0
     ret
 
+handle_hex:
+    mov al, dil
+    sub al, '0'
+    cmp al, 9
+    jbe .conversion
+
+    sub al, 'a'
+    cmp al, 'z'
+    jbe .conversion
+
+    sub al, 'A'
+    cmp al, 'Z'
+    jbe .conversion
+
+ .conversion
+   mov rax, al
+   ret
