@@ -15,7 +15,7 @@ ft_is_hexdigit:
     cmp al, 'a'
     jb .check_upper
     cmp al, 'f'
-    jle .is_hex_digit_true
+    jbe .is_hex_digit_true
 
  .check_upper:
     cmp al, 'A'
@@ -75,7 +75,7 @@ handle_hex:
 
 ft_atoi_base:
     test rdi, rdi
-    jz .invalid_args
+    jz .invalid
 
     cmp rsi, 10
     je .base_10
@@ -83,7 +83,7 @@ ft_atoi_base:
     cmp rsi, 16
     je .base_16
 
-    jmp .invalid_args
+    jmp .invalid
 
  .base_10:
     xor rax, rax
@@ -101,9 +101,9 @@ ft_atoi_base:
     jz .apply_sign
 
     cmp cl, '0'
-    jb .apply_sign
+    jb .invalid
     cmp cl, '9'
-    ja .apply_sign
+    ja .invalid
 
     ; result = result * 10 + (char - '0')
     imul rax, 10
@@ -126,7 +126,8 @@ ft_atoi_base:
     cmp cl, 'x'
     je .skip_prefix
     cmp cl, 'X'
-    jne .done
+    je .skip_prefix
+    jne .invalid
 
  .skip_prefix:
     add rdi, 2
@@ -134,17 +135,22 @@ ft_atoi_base:
  .loop_16:
     movzx rcx, byte [rdi]
     test cl, cl
+    jz .done
 
+    push rdi
     push rax
+    mov dil, cl
     call ft_is_hexdigit
     test rax, rax
+    jz .restore_and_done
+
+    mov dil, cl
+    call handle_hex
+    mov rcx, rax
     pop rax
-    jb .done
+    pop rdi
 
     imul rax, 16
-    sub cl, '0'
-    movzx rcx, cl
-    call handle_hex
     add rax, rcx
 
     inc rdi
@@ -156,9 +162,13 @@ ft_atoi_base:
     neg rax               ; Apply negative sign
     jmp .done
 
- .invalid_args:
+ .invalid
     mov rax, -1
     ret
+
+ .restore_and_done:
+    pop rax
+    jmp .done
 
  .done:
     ret

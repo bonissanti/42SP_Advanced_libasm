@@ -49,6 +49,7 @@ bonus: $(OBJ_FILES_BONUS)
 	@echo "Generating bin for bonus..."
 	@ar rcs $(NAME_BONUS) $(OBJ_FILES_BONUS)
 
+# TODO: delete when finish
 bonus_debug: bonus
 	@echo "Generating debug executable for bonus..."
 	@$(CC) -g3 -o $(BONUS_EXEC) $(SRC_DIR_BONUS)/main.c -L. -l:$(NAME_BONUS) -I./$(SRC_DIR_BONUS)
