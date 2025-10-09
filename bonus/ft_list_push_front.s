@@ -28,7 +28,7 @@ ft_list_push_front:
     mov [rdi], rax          ; *begin_list = new_node
     ret
 
- .add_node_empty_list
+ .add_node_empty_list:
     push rdi
     push rsi
     mov rdi, 16             ; sizeof(t_list) = 16 bytes, parameter for malloc
@@ -40,6 +40,3 @@ ft_list_push_front:
     mov [rax + 8], 0        ; new_node->next = NULL
     mov [rdi], rax          ; *begin_list = new_node
     ret
-
-
-
