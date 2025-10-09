@@ -162,7 +162,7 @@ ft_atoi_base:
     neg rax               ; Apply negative sign
     jmp .done
 
- .invalid
+ .invalid:
     mov rax, -1
     ret
 
