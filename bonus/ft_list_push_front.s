@@ -37,6 +37,6 @@ ft_list_push_front:
     pop rdi
 
     mov [rax + 0], rsi      ; new_node->data = data
-    mov [rax + 8], DWORD 0  ; new_node->next = NULL - DWORD - instruction to CPU treated size specifier as a 32 bit
+    mov QWORD [rax + 8], 0  ; new_node->next = NULL - DWORD - instruction to CPU treated size specifier as a 32 bit
     mov [rdi], rax          ; *begin_list = new_node
     ret
