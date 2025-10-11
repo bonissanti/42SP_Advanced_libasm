@@ -1,8 +1,6 @@
 section .text
 global ft_list_size
 
-extern malloc
-
 ft_list_size:
     xor rax, rax
     test rdi, rdi
