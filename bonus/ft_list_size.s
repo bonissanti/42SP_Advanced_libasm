@@ -10,7 +10,7 @@ ft_list_size:
     cmp rdi, 0
     je .done
     inc rax
-    mov rdi,  [rdi + 8]
+    mov rdi, [rdi + 8]
     jmp .loop_start
 
  .list_is_empty:

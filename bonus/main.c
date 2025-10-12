@@ -1,19 +1,30 @@
 #include <stdio.h>
+#include <string.h>
+
 #include "libasm_bonus.h"
 
-extern void    ft_list_push_front(t_list **begin_list, void *data);
-int ft_list_size(t_list *begin_list);
+extern int      ft_list_size(t_list *begin_list);
+extern void     ft_list_push_front(t_list **begin_list, void *data);
+extern void     ft_list_sort(t_list **begin_list, int (*cmp)());
+
+void ft_list_print(t_list *begin_list)
+{
+    t_list *current = begin_list;
+
+    while (current != NULL)
+    {
+        printf("node->data: %s\n", (char*)current->data);
+        current = current->next;
+    }
+}
 
 int main(void)
 {
-    int size = 0;
-    t_list *list = NULL;
+    t_list *head = NULL;
+    ft_list_push_front(&head, "Aucker");
+    ft_list_push_front(&head, "Sucker");
+    ft_list_push_front(&head, "Dicker");
 
-    ft_list_push_front(&list, "Hello, World!");
-    size = ft_list_size(list);
-    printf("Size now is: %d\n", size);
-
-    ft_list_push_front(&list, "Hello, World, from next!");
-    size = ft_list_size(list);
-    printf("Size now is: %d\n", size);
+    ft_list_sort(&head, strcmp);
+    ft_list_print(head);
 }
