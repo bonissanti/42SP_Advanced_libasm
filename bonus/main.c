@@ -24,7 +24,13 @@ int main(void)
     ft_list_push_front(&head, "Aucker");
     ft_list_push_front(&head, "Sucker");
     ft_list_push_front(&head, "Dicker");
+    ft_list_push_front(&head, "Fucker");
+
+    printf("ANTES do sort:\n");
+    ft_list_print(head);
 
     ft_list_sort(&head, strcmp);
+
+    printf("\nDEPOIS do sort:\n");
     ft_list_print(head);
 }
