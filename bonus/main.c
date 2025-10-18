@@ -3,9 +3,10 @@
 
 #include "libasm_bonus.h"
 
-extern int      ft_list_size(t_list *begin_list);
 extern void     ft_list_push_front(t_list **begin_list, void *data);
 extern void     ft_list_sort(t_list **begin_list, int (*cmp)());
+extern int      ft_strcmp(const char *s1, const char *s2);
+
 
 void ft_list_print(t_list *begin_list)
 {
@@ -29,7 +30,7 @@ int main(void)
     printf("ANTES do sort:\n");
     ft_list_print(head);
 
-    ft_list_sort(&head, strcmp);
+    ft_list_sort(&head, ft_strcmp);
 
     printf("\nDEPOIS do sort:\n");
     ft_list_print(head);
