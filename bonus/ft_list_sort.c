@@ -36,41 +36,38 @@ void    ft_list_push_front(t_list **begin_list, void *data)
     }
 }
 
+void swapList(t_list *a, t_list *b)
+{
+    void *temp = a->data;
+    a->data = b->data;
+    b->data = temp;
+}
+
 void ft_list_sort(t_list **begin_list, int (*cmp)())
 {
-    int len = ft_list_size(*begin_list);
+    int swapped;
+    const t_list *lastSorted = NULL;
 
-    while (len > 0)
+    if (*begin_list == NULL)
+        return;
+
+    do
     {
-        t_list *current = *begin_list;
-        t_list *previous = *begin_list;
+        swapped = 0;
+        t_list* current = *begin_list;
 
-        while (current->next != NULL)
+        while (current->next != lastSorted)
         {
-            t_list *temp = current->next;
-            if (((int (*)(void *, void *))cmp)(current->data, temp->data) > 0)
+            if (((int (*)(void *, void *))cmp)(current->data, current->next->data) > 0)
             {
-                if (current == *begin_list)
-                {
-                    current->next = temp->next;
-                    temp->next = current;
-                    previous = temp;
-                    *begin_list = previous;
-                }
-                else
-                {
-                    current->next = temp->next;
-                    temp->next = current;
-                    previous->next = temp;
-                    previous = temp;
-                }
-                continue;
+                swapList(current, current->next);
+                swapped = 1;
             }
-            previous = current;
             current = current->next;
         }
-        len--;
+        lastSorted = current;
     }
+    while (swapped);
 }
 
 void ft_list_print(t_list *begin_list)
