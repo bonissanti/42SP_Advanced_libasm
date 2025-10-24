@@ -10,44 +10,60 @@ ft_list_remove_if:
   je .done
 
   push rbx
-  push r11
   push r12
   push r13
   push r14
   push r15
 
-  mov r11, rdi      ; r11 = **begin_list
-  xor r12, r12      ; previous = NULL
-  mov r13, rsi      ; r13 = data_ref
-  mov r14, rdx      ; r14 = cmp function
-  mov r15, rcx      ; r15 = free function
+  mov rbx rdi       ; r11 = **begin_list
+  xor r12, [rdi]    ; r12 = *current
+  mov r13, r13      ; r13 = previous NULL
+  mov r14, rsi      ; r14 = data_ref 
+  mov r15, rdx      ; r15 = cmp function
+  push rcx          ; rcx = free function
 
-  .loop:
-    push rax
-    mov rdi, [r11]  ; rdi = *begin_list
-    mov rax, [rdi]  ; rax = current->data
-    mov rsi, r13    ; pass data_ref to rsi
-    call r14        ; call cmp
-    pop rax
+  .loop:                  ; while (current != NULL)
+    test r12, r12
+    je .done
+    
+    mov rdi, [r12]
+    mov rsi, r14
+    call r15
 
-    cmp eax, 0      ; check if is equal 0 to remove
+    test eax, eax         ; check if is equal 0 to remove
     je .remove_item
 
-    mov r12, rdi          ; previous = current
-    mov rdi, [r11 + 8]    ; current = current->next
+    mov r13, r12          ; previous = current
+    mov r12, [r12 + 8]    ; current = current->next
     jmp .loop
 
   .remove_item:
-    mov rax, r11          ; to_delete = *current
-    mov r11, [r11 + 8]    ; current = current->next
+    push rbx
+    mov rbx, r12          ; to_delete = *current
+    mov r12, [r12 + 8]    ; current = current->next
 
-    cmp rax, 0                  ; previous == NULL
-    je if_previous_is_null
+    test r13, r13
+    jz .update_head
 
+    mov [r13 + 8], r12    ; r13 + 8 = previous->next = current
+    jmp .free_data
 
+    mov r13, r12          ; previous = current
+    mov r12, [r12 + 8]    ; current = current->next
 
+  .update_head:
+    mov [rbx], r12
+    jmp .loop
+  
+  .free_data:
+    pop rdi
+    push rdi
+    mov rdi, [rbx]        ; rdi = to_delete->data
+    call rcx              ; call free_fct
+    pop rdi               ; restore rdi
+    jmp .loop
 
-
-
+  .done:
+    ret
 
 ; vim:ft=nasm
