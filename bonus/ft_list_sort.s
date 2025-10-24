@@ -3,7 +3,7 @@ global  ft_list_sort
 
 ft_list_sort:
     test rdi, rdi
-    je .done
+    je done
 
     mov rax, [rdi]
     test rax, rax
@@ -36,7 +36,7 @@ ft_list_sort:
     cmp eax, 0              ; eax = 32 bits | strcmp returns int 32 bits
     jle .no_swap
 
-    mov rsi, [rdi]          ; temp = current->data
+    mov $rsi, [rdi]         ; temp = current->data
     mov rcx, [rdi + 8]      ; rcx = current->next
     mov rax, [rcx]          ; rax = current->next->data
     mov [rdi], rax          ; current->data = current->next->data
@@ -59,3 +59,5 @@ ft_list_sort:
 
  .done:
     ret
+
+; vim:ft=nasm

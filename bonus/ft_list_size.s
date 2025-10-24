@@ -19,3 +19,5 @@ ft_list_size:
 
  .done:
     ret
+
+; vim:ft=nasm
