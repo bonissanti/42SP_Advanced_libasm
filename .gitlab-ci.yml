@@ -1,17 +1,40 @@
-build-job:
-  stage: build
-  script:
-    - echo "Hello, World!"
-
-  test-job1:
-    stage: test
-    script:
-      - echo "This job tests something."
-
-  test-job2:
-    stage: test
-    script:
-      - echo "This job tests something, but takes more time than test-job1."
-      - echo "After the echo commands complete, it runs the sleep command for 20 seconds"
-      - echo "which simulates a test that runs 20 seconds longer than test-job1"
-      - sleep 20
+#stages:
+#    - build
+#    - test
+#
+#variables:
+#    LIBRARY_NAME: "libasm.a"
+#    OBJ_DIR: "obj"
+#
+#.common_setup: &common_setup
+#    before_script:
+#        - echo "Starting job on $(date)"
+#        - echo "Working directory: $(pwd)"
+#
+#build_library:
+#    stage: build
+#    <<: *common_setup
+#    script:
+#        - echo "🧹 Cleaning workspace..."
+#        - make fclean > /dev/null 2>&1 || true
+#
+#        - echo "🔨 Building $LIBRARY_NAME..."
+#        - make > make_output.log 2>&1
+#        - make_exit_code=$?
+#
+#        - |
+#            if [ $make_exit_code -ne 0 ]; then
+#                echo "❌ Make command failed with exit code: $make_exit_code"
+#                cat make_output.log
+#                exit 1
+#            fi
+#
+#        - |
+#            if [ ! -f "$LIBRARY_NAME" ]; then
+#                echo "❌ Binary '$LIBRARY_NAME' not created"
+#                ls -la
+#                exit 1
+#            fi
+#
+#        - echo "✅ Binary created successfully: $LIBRARY_NAME"
+#        - ls -lh $LIBRARY_NAME
