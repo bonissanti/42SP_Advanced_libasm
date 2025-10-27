@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "libasm_bonus.h"
 
 void ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)(), void (*free_fct)(void *))
@@ -82,5 +81,4 @@ int main(void)
 
     ft_list_remove_if(&head, "Sucker", strcmp, safe_free);
     ft_list_print(head);
-
 }

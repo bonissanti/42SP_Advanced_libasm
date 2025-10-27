@@ -15,7 +15,7 @@ ft_list_remove_if:
   push r14
   push r15
 
-  mov rbx rdi       ; r11 = **begin_list
+  mov rbx, rdi       ; r11 = **begin_list
   xor r12, [rdi]    ; r12 = *current
   mov r13, r13      ; r13 = previous NULL
   mov r14, rsi      ; r14 = data_ref 
@@ -52,7 +52,7 @@ ft_list_remove_if:
     mov r12, [r12 + 8]    ; current = current->next
 
   .update_head:
-    mov [rbx], r12
+    mov [rbx], r12        ; *begin_list = current
     jmp .loop
   
   .free_data:

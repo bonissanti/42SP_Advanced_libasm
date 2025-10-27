@@ -1,10 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-
 #include "libasm_bonus.h"
 
+extern void     ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)(void *, void *), void (*free_fct)(void *)); // in older versions, change to int(*cmp)()
 extern void     ft_list_push_front(t_list **begin_list, void *data);
-extern void     ft_list_sort(t_list **begin_list, int (*cmp)());
 extern int      ft_strcmp(const char *s1, const char *s2);
 
 
@@ -19,19 +19,23 @@ void ft_list_print(t_list *begin_list)
     }
 }
 
+void    safe_free(void *data)
+{
+    free(data);
+    data = NULL;
+}
+
 int main(void)
 {
     t_list *head = NULL;
-    ft_list_push_front(&head, "Aucker");
-    ft_list_push_front(&head, "Sucker");
-    ft_list_push_front(&head, "Dicker");
-    ft_list_push_front(&head, "Fucker");
 
-    printf("ANTES do sort:\n");
-    ft_list_print(head);
+    ft_list_push_front(&head, strdup("Sucker"));
+    ft_list_push_front(&head, strdup("Aucker"));
+    ft_list_push_front(&head, strdup("Sucker"));
+    ft_list_push_front(&head, strdup("Dicker"));
+    ft_list_push_front(&head, strdup("Sucker"));
+    ft_list_push_front(&head, strdup("Fucker"));
 
-    ft_list_sort(&head, ft_strcmp);
-
-    printf("\nDEPOIS do sort:\n");
+    ft_list_remove_if(&head, "Sucker", (int (*)(void *, void *))ft_strcmp, (void (*)(void *))safe_free);
     ft_list_print(head);
 }
