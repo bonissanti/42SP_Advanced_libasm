@@ -16,15 +16,15 @@ ft_list_remove_if:
   push r15
 
   mov rbx, rdi       ; r11 = **begin_list
-  xor r12, [rdi]    ; r12 = *current
-  mov r13, r13      ; r13 = previous NULL
+  mov r12, [rdi]    ; r12 = *current
+  xor r13, r13      ; r13 = previous NULL
   mov r14, rsi      ; r14 = data_ref 
   mov r15, rdx      ; r15 = cmp function
   push rcx          ; rcx = free function
 
   .loop:                  ; while (current != NULL)
     test r12, r12
-    je .done
+    je .done_loop
     
     mov rdi, [r12]
     mov rsi, r14
@@ -38,8 +38,7 @@ ft_list_remove_if:
     jmp .loop
 
   .remove_item:
-    push rbx
-    mov rbx, r12          ; to_delete = *current
+    push r12
     mov r12, [r12 + 8]    ; current = current->next
 
     test r13, r13
@@ -48,9 +47,6 @@ ft_list_remove_if:
     mov [r13 + 8], r12    ; r13 + 8 = previous->next = current
     jmp .free_data
 
-    mov r13, r12          ; previous = current
-    mov r12, [r12 + 8]    ; current = current->next
-
   .update_head:
     mov [rbx], r12        ; *begin_list = current
     jmp .loop
@@ -58,10 +54,19 @@ ft_list_remove_if:
   .free_data:
     pop rdi
     push rdi
-    mov rdi, [rbx]        ; rdi = to_delete->data
+    mov rdi, [rdi]        ; rdi = to_delete->data
     call rcx              ; call free_fct
     pop rdi               ; restore rdi
     jmp .loop
+
+  .done_loop:
+    pop rcx
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop rbx
+    
 
   .done:
     ret

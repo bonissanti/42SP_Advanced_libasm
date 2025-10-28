@@ -20,6 +20,7 @@ void ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)(), void (
             else
                 previous->next = current;
             (*free_fct)(to_delete->data);
+            (*free_fct)(to_delete);
         }
         else
         {
