@@ -2,11 +2,20 @@ section .text
 global  ft_list_remove_if
 
 ft_list_remove_if:
-  test rdi, rdi     ; check **begin_list
+  test rdi, rdi       ; check **begin_list
   je .done
 
-  mov rax, [rdi]    ; check *current
-  test rax, rax
+  mov rax, [rdi]
+  test rax, rax       ; check *begin_list
+  je .done
+
+  test rsi, rsi       ; check *data_ref
+  je .done
+
+  test rdx, rdx       ; check *cmp function
+  je .done
+
+  test rcx, rcx       ; check *free_fct function
   je .done
 
   push rbx
@@ -14,59 +23,47 @@ ft_list_remove_if:
   push r13
   push r14
   push r15
+  push rcx            ; save *free_fct
 
-  mov rbx, rdi       ; r11 = **begin_list
-  mov r12, [rdi]    ; r12 = *current
-  xor r13, r13      ; r13 = previous NULL
-  mov r14, rsi      ; r14 = data_ref 
-  mov r15, rdx      ; r15 = cmp function
-  push rcx          ; rcx = free function
+  mov rbx, rdi        ; rbx == **begin_list
+  mov r12, rsi        ; r12 == *data_ref
+  mov r13, rdx        ; r13 == *cmp
+  mov r14, [rdi]      ; *current = *begin_list
+  xor r15, r15        ; *previous = NULL
 
-  .loop:                  ; while (current != NULL)
-    test r12, r12
-    je .done_loop
+  .loop:
+    cmp r14, 0
+    je .done_list
     
-    mov rdi, [r12]
-    mov rsi, r14
-    call r15
+    mov rdi, [r14]
+    mov rsi, r12
+    call r13
 
-    test eax, eax         ; check if is equal 0 to remove
-    je .remove_item
+    test eax, eax
+    je .remove_data
 
-    mov r13, r12          ; previous = current
-    mov r12, [r12 + 8]    ; current = current->next
+    mov r15, r14
+    mov r14, [r14 + 8]
     jmp .loop
 
-  .remove_item:
-    push r12
-    mov r12, [r12 + 8]    ; current = current->next
 
-    test r13, r13
+  .remove_data:
+    
+
+    test r15, r15
     jz .update_head
 
-    mov [r13 + 8], r12    ; r13 + 8 = previous->next = current
-    jmp .free_data
-
   .update_head:
-    mov [rbx], r12        ; *begin_list = current
-    jmp .loop
-  
-  .free_data:
-    pop rdi
-    push rdi
-    mov rdi, [rdi]        ; rdi = to_delete->data
-    call rcx              ; call free_fct
-    pop rdi               ; restore rdi
+    mov rdi, r14
     jmp .loop
 
-  .done_loop:
+  .done_list:
     pop rcx
     pop r15
     pop r14
     pop r13
     pop r12
     pop rbx
-    
 
   .done:
     ret
