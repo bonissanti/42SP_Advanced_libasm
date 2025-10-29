@@ -32,29 +32,42 @@ ft_list_remove_if:
   xor r15, r15        ; *previous = NULL
 
   .loop:
-    cmp r14, 0            ; while current != NULL
+    test r14, r14            ; while current != NULL
     je .done_list
     
     mov rdi, [r14]
     mov rsi, r12
     call r13
 
-    test eax, eax         ; what is eax even?
-    je .remove_data       ; TODO: should be update_head instead
+    test eax, eax         ; verify return from cmp
+    je .remove_data
 
     mov r15, r14          ; previous = current;
     mov r14, [r14 + 8]    ; current = current->next
     jmp .loop
 
-  .remove_data:           ; FIX: need to be implemented and change position with update_head
-    test r15, r15
+  .remove_data:
+    push r14
+    mov r14, [r14 + 8]  
+
+    test r15, r15           ; verify if previous is null
     jz .update_head
-    
+
+    mov [r15 + 8], r14      ; previous->next = current
+    jmp .free_data
 
   .update_head:
-    mov rdi, r14
+    mov [rbx], r14          ; *begin_list = current
     jmp .loop
 
+  .free_data:
+    pop rdi                 ; retire older rdi from stack
+    push rdi
+    mov rdi, [rdi]          ; rdi = to_delete->data
+    call rcx                ; call free_rct
+    pop rdi
+    jmp .loop
+ 
   .done_list:
     pop rcx
     pop r15
