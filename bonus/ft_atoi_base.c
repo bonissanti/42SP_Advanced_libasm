@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 bool ft_is_digit(char c)
 {
@@ -23,7 +24,7 @@ static int handle_hex(char c)
     return 0;
 }
 
-int ft_atoi_base(const char *str, int base)
+int ft_atoi_base(const char *str, char *base)
 {
     int i;
     int result;
@@ -33,7 +34,10 @@ int ft_atoi_base(const char *str, int base)
     result = 0;
     signal = 1;
 
-    if (base == 16)
+    if (!base || strlen(base) <= 1)
+        return 0;
+
+    if (strcmp(base, "16") == 0)
     {
         if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
         {
@@ -42,7 +46,7 @@ int ft_atoi_base(const char *str, int base)
                 result = result * 16 + handle_hex(str[i++]);
         }
     }
-    else
+    else if (strcmp(base, "10") == 0)
     {
         if (str[0] == '-')
         {
@@ -52,14 +56,16 @@ int ft_atoi_base(const char *str, int base)
         while (str[i] && ft_is_digit(str[i]))
             result = result * 10 + str[i++] - '0';
     }
+    else
+        return 0;
+
     return signal * result;
 }
 
 int main(void)
 {
     int expected = atoi("12345a");
-    int result = ft_atoi_base("0x12345a", 16);
+    int result = ft_atoi_base("12345a", "10");
     printf("Result: %d\n", result);
     printf("Expected: %d\n", expected);
-
 }

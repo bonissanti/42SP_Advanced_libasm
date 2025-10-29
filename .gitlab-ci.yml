@@ -1,40 +1,174 @@
-#stages:
-#    - build
-#    - test
-#
-#variables:
-#    LIBRARY_NAME: "libasm.a"
-#    OBJ_DIR: "obj"
-#
-#.common_setup: &common_setup
-#    before_script:
-#        - echo "Starting job on $(date)"
-#        - echo "Working directory: $(pwd)"
-#
-#build_library:
-#    stage: build
-#    <<: *common_setup
-#    script:
-#        - echo "🧹 Cleaning workspace..."
-#        - make fclean > /dev/null 2>&1 || true
-#
-#        - echo "🔨 Building $LIBRARY_NAME..."
-#        - make > make_output.log 2>&1
-#        - make_exit_code=$?
-#
-#        - |
-#            if [ $make_exit_code -ne 0 ]; then
-#                echo "❌ Make command failed with exit code: $make_exit_code"
-#                cat make_output.log
-#                exit 1
-#            fi
-#
-#        - |
-#            if [ ! -f "$LIBRARY_NAME" ]; then
-#                echo "❌ Binary '$LIBRARY_NAME' not created"
-#                ls -la
-#                exit 1
-#            fi
-#
-#        - echo "✅ Binary created successfully: $LIBRARY_NAME"
-#        - ls -lh $LIBRARY_NAME
+stages:
+  - build
+  - test
+
+variables:
+  LIBRARY_NAME: "libasm.a"
+  OBJ_DIR: "obj"
+
+# Template for common setup
+.common_setup: &common_setup
+  before_script:
+    - echo "Starting job on $(date)"
+    - echo "Working directory: $(pwd)"
+
+# Build stage
+build_library:
+  stage: build
+  <<: *common_setup
+  script:
+    - echo "🧹 Cleaning workspace..."
+    - make fclean > /dev/null 2>&1 || true
+    
+    - echo "🔨 Building $LIBRARY_NAME..."
+    - make > make_output.log 2>&1
+    - make_exit_code=$?
+    
+    - |
+      if [ $make_exit_code -ne 0 ]; then
+        echo "❌ Make command failed with exit code: $make_exit_code"
+        cat make_output.log
+        exit 1
+      fi
+    
+    - |
+      if [ ! -f "$LIBRARY_NAME" ]; then
+        echo "❌ Binary '$LIBRARY_NAME' not created"
+        ls -la
+        exit 1
+      fi
+    
+    - echo "✅ Binary created successfully: $LIBRARY_NAME"
+    - ls -lh $LIBRARY_NAME
+  
+  artifacts:
+    paths:
+      - $LIBRARY_NAME
+      - $OBJ_DIR/
+    expire_in: 1 hour
+    when: always
+  
+  artifacts:
+    reports:
+      dotenv: build.env
+    paths:
+      - $LIBRARY_NAME
+      - make_output.log
+    expire_in: 1 hour
+    when: always
+
+# Clean test
+test_clean:
+  stage: test
+  <<: *common_setup
+  dependencies:
+    - build_library
+  script:
+    - echo "🧪 Testing make fclean..."
+    - make fclean > /dev/null 2>&1
+    
+    - |
+      if [ -f "$LIBRARY_NAME" ]; then
+        echo "❌ Binary '$LIBRARY_NAME' not removed after fclean"
+        exit 1
+      fi
+    
+    - |
+      if [ -d "$OBJ_DIR" ] && [ -n "$(ls -A $OBJ_DIR 2>/dev/null)" ]; then
+        echo "❌ Object files not removed after fclean"
+        ls -la $OBJ_DIR
+        exit 1
+      fi
+    
+    - echo "✅ Clean successful - binary and objects removed"
+
+# Rebuild test
+test_rebuild:
+  stage: test
+  <<: *common_setup
+  dependencies:
+    - build_library
+  script:
+    - echo "🧪 Testing make re..."
+    - make re > /dev/null 2>&1
+    
+    - |
+      if [ ! -f "$LIBRARY_NAME" ]; then
+        echo "❌ Binary '$LIBRARY_NAME' not created after make re"
+        exit 1
+      fi
+    
+    - echo "✅ Rebuild successful"
+
+# No unnecessary rebuild test
+test_no_rebuild:
+  stage: test
+  <<: *common_setup
+  dependencies:
+    - build_library
+  script:
+    - echo "🧪 Testing for unnecessary rebuilds..."
+    - make_output=$(make 2>&1)
+    
+    - |
+      if ! echo "$make_output" | grep -q "Nothing to be done\|up to date" && [ -n "$make_output" ]; then
+        echo "❌ Make unnecessarily rebuilt: $make_output"
+        exit 1
+      fi
+    
+    - echo "✅ No unnecessary rebuild detected"
+
+# Unit tests with Criterion
+test_unit:
+  stage: test
+  <<: *common_setup
+  dependencies:
+    - build_library
+  script:
+    - echo "🧪 Checking for test target..."
+    - |
+      if grep -q "^test:" Makefile 2>/dev/null; then
+        echo "Running unit tests..."
+        make test > test_output.log 2>&1
+        test_exit_code=$?
+        
+        if [ $test_exit_code -ne 0 ]; then
+          echo "❌ Unit tests failed"
+          cat test_output.log
+          exit 1
+        fi
+        
+        echo "✅ Unit tests passed"
+      else
+        echo "⚠️  No test target found in Makefile, skipping..."
+        exit 0
+      fi
+  
+  artifacts:
+    reports:
+      junit: test_output.xml
+    paths:
+      - test_output.log
+    expire_in: 1 week
+    when: always
+  
+  allow_failure: false
+
+# Optional: Code quality checks
+code_quality:
+  stage: test
+  <<: *common_setup
+  dependencies:
+    - build_library
+  script:
+    - echo "🔍 Running code quality checks..."
+    - |
+      if command -v norminette &> /dev/null; then
+        norminette src/ include/ || echo "⚠️  Norminette issues found"
+      else
+        echo "⚠️  Norminette not installed, skipping..."
+      fi
+  allow_failure: true
+  only:
+    - merge_requests
+    - main

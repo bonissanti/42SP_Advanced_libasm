@@ -1,7 +1,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "libasm_bonus.h"
 
 int ft_list_size(t_list *begin_list)
@@ -48,5 +47,4 @@ int main(void)
     ft_list_push_front(&list, "Hello, World, from next!");
     size = ft_list_size(list);
     printf("Size now is: %d\n", size);
-
 }
