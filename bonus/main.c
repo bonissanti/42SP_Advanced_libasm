@@ -6,6 +6,7 @@
 extern void     ft_list_remove_if(t_list **begin_list, void *data_ref, int (*cmp)(void *, void *), void (*free_fct)(void *)); // in older versions, change to int(*cmp)()
 extern void     ft_list_push_front(t_list **begin_list, void *data);
 extern int      ft_strcmp(const char *s1, const char *s2);
+extern int      ft_atoi_base(const char *str, const char *base);
 
 
 void ft_list_print(t_list *begin_list)
@@ -25,17 +26,25 @@ void    safe_free(void *data)
     data = NULL;
 }
 
+// int main(void)
+// {
+//     t_list *head = NULL;
+//
+//     ft_list_push_front(&head, strdup("Sucker"));
+//     ft_list_push_front(&head, strdup("Aucker"));
+//     ft_list_push_front(&head, strdup("Sucker"));
+//     ft_list_push_front(&head, strdup("Dicker"));
+//     ft_list_push_front(&head, strdup("Sucker"));
+//     ft_list_push_front(&head, strdup("Fucker"));
+//
+//     ft_list_remove_if(&head, "Sucker", (int (*)(void *, void *))ft_strcmp, (void (*)(void *))safe_free);
+//     ft_list_print(head);
+// }
+
 int main(void)
 {
-    t_list *head = NULL;
-
-    ft_list_push_front(&head, strdup("Sucker"));
-    ft_list_push_front(&head, strdup("Aucker"));
-    ft_list_push_front(&head, strdup("Sucker"));
-    ft_list_push_front(&head, strdup("Dicker"));
-    ft_list_push_front(&head, strdup("Sucker"));
-    ft_list_push_front(&head, strdup("Fucker"));
-
-    ft_list_remove_if(&head, "Sucker", (int (*)(void *, void *))ft_strcmp, (void (*)(void *))safe_free);
-    ft_list_print(head);
+    int expected = atoi("12345a");
+    int result = ft_atoi_base("12345a", "10");
+    printf("Result: %d\n", result);
+    printf("Expected: %d\n", expected);
 }
