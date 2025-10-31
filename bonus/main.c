@@ -43,8 +43,10 @@ void    safe_free(void *data)
 
 int main(void)
 {
+    const char str1[] = "12345a";
+    const char base[] = "10";
     int expected = atoi("12345a");
-    int result = ft_atoi_base("12345a", "10");
+    int result = ft_atoi_base(str1, base);
     printf("Result: %d\n", result);
     printf("Expected: %d\n", expected);
 }

@@ -5,9 +5,8 @@ global  handle_hex
 
 extern  ft_strcmp
 
-section .data
-base10 db "10", 0
-base16 db "16", 0
+;section .data
+;    base10 db "10", 0
 
 ; verify if char is hexadecimal
 ft_is_hexdigit:
@@ -83,23 +82,23 @@ ft_atoi_base:
     test rdi, rdi       ; check char *str
     jz .invalid
 
-    test rsi, rsi       ; check char *base
+    test rsi, rsi
     jz .invalid
 
-    mov f12, rdi        ; save *str
-    mov f13, rsi        ; save *base
-    push f12
-    push f13
+    push r12
+    push r13
 
-    mov rdi, f13
-    mov rsi, base10
+    mov r12, rdi
+    mov r13, rsi
+
+    mov rdi, rsi
+    mov rsi, 0
     call ft_strcmp
-    cmp eax, 0
     jz .base_10
 
-    mov rsi, base16
+    mov rdi, rsi
+    mov rsi, 0
     call ft_strcmp
-    cmp eax, 0
     jz .base_16
 
     jmp .invalid
