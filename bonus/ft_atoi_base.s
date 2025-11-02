@@ -193,5 +193,5 @@ ft_atoi_base:
 
  .done:
     pop r13
-    pop r12
+    pop r13
     ret

@@ -43,7 +43,7 @@ void    safe_free(void *data)
 
 int main(void)
 {
-    const char str1[] = "0X12345a";
+    const char str1[] = "0x12345a";
     const char base[] = "16";
     int expected = atoi("12345a");
     int result = ft_atoi_base(str1, base);
