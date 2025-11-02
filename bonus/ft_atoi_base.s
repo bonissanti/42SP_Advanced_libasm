@@ -1,12 +1,13 @@
+section .data
+    base10 db "10", 0
+    base16 db "16", 0
+
 section .text
 global  ft_is_hexdigit
 global  ft_atoi_base
 global  handle_hex
 
 extern  ft_strcmp
-
-;section .data
-;    base10 db "10", 0
 
 ; verify if char is hexadecimal
 ft_is_hexdigit:
@@ -82,22 +83,22 @@ ft_atoi_base:
     test rdi, rdi       ; check char *str
     jz .invalid
 
-    test rsi, rsi
+    test rsi, rsi       ; check char *base
     jz .invalid
 
     push r12
     push r13
 
-    mov r12, rdi
-    mov r13, rsi
+    mov r12, rdi        ; save *str on r12
+    mov r13, rsi        ; save *base on r13
 
-    mov rdi, rsi
-    mov rsi, 0
+    mov rdi, rsi        ; 1st arg = *base
+    mov rsi, base10
     call ft_strcmp
     jz .base_10
 
-    mov rdi, rsi
-    mov rsi, 0
+    mov rdi, rsi        ; 2nd arg = *base
+    mov rsi, base16
     call ft_strcmp
     jz .base_16
 
