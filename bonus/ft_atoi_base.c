@@ -65,7 +65,7 @@ int ft_atoi_base(const char *str, char *base)
 int main(void)
 {
     int expected = atoi("12345a");
-    int result = ft_atoi_base("12345a", "10");
+    int result = ft_atoi_base("12345a", "16");
     printf("Result: %d\n", result);
     printf("Expected: %d\n", expected);
 }

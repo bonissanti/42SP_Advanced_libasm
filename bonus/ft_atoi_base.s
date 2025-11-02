@@ -3,11 +3,13 @@ section .data
     base16 db "16", 0
 
 section .text
-global  ft_is_hexdigit
-global  ft_atoi_base
-global  handle_hex
+    global  ft_is_hexdigit
+    global  ft_atoi_base
+    global  handle_hex
 
-extern  ft_strcmp
+    extern  ft_strcmp
+
+; TIP: use ldd <program_name> to see library linked to bin
 
 ; verify if char is hexadecimal
 ft_is_hexdigit:
@@ -93,12 +95,12 @@ ft_atoi_base:
     mov r13, rsi        ; save *base on r13
 
     mov rdi, rsi        ; 1st arg = *base
-    mov rsi, base10
+    lea rsi, [rel base10]
     call ft_strcmp
     jz .base_10
 
-    mov rdi, rsi        ; 2nd arg = *base
-    mov rsi, base16
+    mov rdi, r13        ; 2nd arg = *base
+    lea rsi, [rel base16]
     call ft_strcmp
     jz .base_16
 
@@ -108,14 +110,14 @@ ft_atoi_base:
     xor rax, rax
     xor r8, r8              ; signal = 0
 
-    movzx rcx, byte [rdi]
+    movzx rcx, byte [r12]
     cmp cl, '-'
     jne .loop_10
-    inc rdi
+    inc r12
     mov r8, 1               ; signal = 1
 
  .loop_10:
-    movzx rcx, byte [rdi]
+    movzx rcx, byte [r12]
     test cl, cl             ; check null
     jz .apply_sign
 
@@ -130,18 +132,17 @@ ft_atoi_base:
     movzx rcx, cl
     add rax, rcx
 
-    inc rdi
+    inc r12
     jmp .loop_10
 
  .base_16:
     xor rax, rax
 
-    ; Check for "0x" or "0X" prefix
-    movzx rcx, byte [rdi]
+    movzx rcx, byte [r12]
     cmp cl, '0'
     jne .done
 
-    movzx rcx, byte [rdi + 1]
+    movzx rcx, byte [r12 + 1]
     cmp cl, 'x'
     je .skip_prefix
     cmp cl, 'X'
@@ -149,15 +150,15 @@ ft_atoi_base:
     jne .invalid
 
  .skip_prefix:
-    add rdi, 2
+    add r12, 2
 
  .loop_16:
-    movzx rcx, byte [rdi]
+    movzx rcx, byte [r12]
     test cl, cl
     jz .done
 
-    push rdi
     push rax
+    mov rdi, r12
     mov dil, cl
     call ft_is_hexdigit
     test rax, rax
@@ -167,12 +168,11 @@ ft_atoi_base:
     call handle_hex
     mov rcx, rax
     pop rax
-    pop rdi
 
     imul rax, 16
     add rax, rcx
 
-    inc rdi
+    inc r12
     jmp .loop_16
 
 .apply_sign:
@@ -182,7 +182,9 @@ ft_atoi_base:
     jmp .done
 
  .invalid:
-    mov rax, -1
+    pop r13
+    pop r12
+    mov rax, 0
     ret
 
  .restore_and_done:
@@ -190,4 +192,6 @@ ft_atoi_base:
     jmp .done
 
  .done:
+    pop r13
+    pop r12
     ret
