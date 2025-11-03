@@ -19,6 +19,13 @@
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+image: ubuntu:22.04
+
+before_script:
+  - apt-get update -qq
+  - apt-get install - y -qq nasm gcc make libcriterion-dev
 
 stages:          # List of stages for jobs, and their order of execution
   - build
@@ -31,13 +38,20 @@ build-job:       # This job runs in the build stage, which runs first.
     - echo "Compiling the code..."
     - make
     - echo "Compile complete."
+  artifacts:
+    paths:
+      - mandatory/obj/
+      - libasm.a
+    expire_in: 1 hour
 
 unit-test-job:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
+  dependencies:
+    - build-job
   script:
     - echo "Running unit tests..."
     - make test
-    - echo "Tests runned successfully"
+    - echo "Tests completed successfully"
 
 # lint-test-job:   # This job also runs in the test stage.
 #   stage: test    # It can run at the same time as unit-test-job (in parallel).
