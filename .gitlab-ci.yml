@@ -1,174 +1,68 @@
-stages:
+# This file is a template, and might need editing before it works on your project.
+# This is a sample GitLab CI/CD configuration file that should run without any modifications.
+# It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
+# it uses echo commands to simulate the pipeline execution.
+#
+# A pipeline is composed of independent jobs that run scripts, grouped into stages.
+# Stages run in sequential order, but jobs within stages run in parallel.
+#
+# For more information, see: https://docs.gitlab.com/ee/ci/yaml/#stages
+#
+# You can copy and paste this template into a new `.gitlab-ci.yml` file.
+# You should not add this template to an existing `.gitlab-ci.yml` file by using the `include:` keyword.
+#
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/development/cicd/templates/
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+image: ubuntu:22.04
+
+before_script:
+  - apt-get update -qq
+  - apt-get install -y -qq nasm gcc make libcriterion-dev
+
+stages:          # List of stages for jobs, and their order of execution
   - build
   - test
+  - deploy
 
-variables:
-  LIBRARY_NAME: "libasm.a"
-  OBJ_DIR: "obj"
-
-# Template for common setup
-.common_setup: &common_setup
-  before_script:
-    - echo "Starting job on $(date)"
-    - echo "Working directory: $(pwd)"
-
-# Build stage
-build_library:
+build-job:       # This job runs in the build stage, which runs first.
   stage: build
-  <<: *common_setup
   script:
-    - echo "🧹 Cleaning workspace..."
-    - make fclean > /dev/null 2>&1 || true
-    
-    - echo "🔨 Building $LIBRARY_NAME..."
-    - make > make_output.log 2>&1
-    - make_exit_code=$?
-    
-    - |
-      if [ $make_exit_code -ne 0 ]; then
-        echo "❌ Make command failed with exit code: $make_exit_code"
-        cat make_output.log
-        exit 1
-      fi
-    
-    - |
-      if [ ! -f "$LIBRARY_NAME" ]; then
-        echo "❌ Binary '$LIBRARY_NAME' not created"
-        ls -la
-        exit 1
-      fi
-    
-    - echo "✅ Binary created successfully: $LIBRARY_NAME"
-    - ls -lh $LIBRARY_NAME
-  
+    - echo "Compiling the code..."
+    - make
+    - echo "Compile complete."
   artifacts:
     paths:
-      - $LIBRARY_NAME
-      - $OBJ_DIR/
+      - mandatory/obj/
+      - libasm.a
     expire_in: 1 hour
-    when: always
-  
-  artifacts:
-    reports:
-      dotenv: build.env
-    paths:
-      - $LIBRARY_NAME
-      - make_output.log
-    expire_in: 1 hour
-    when: always
 
-# Clean test
-test_clean:
-  stage: test
-  <<: *common_setup
+unit-test-job:   # This job runs in the test stage.
+  stage: test    # It only starts when the job in the build stage completes successfully.
   dependencies:
-    - build_library
+    - build-job
   script:
-    - echo "🧪 Testing make fclean..."
-    - make fclean > /dev/null 2>&1
-    
-    - |
-      if [ -f "$LIBRARY_NAME" ]; then
-        echo "❌ Binary '$LIBRARY_NAME' not removed after fclean"
-        exit 1
-      fi
-    
-    - |
-      if [ -d "$OBJ_DIR" ] && [ -n "$(ls -A $OBJ_DIR 2>/dev/null)" ]; then
-        echo "❌ Object files not removed after fclean"
-        ls -la $OBJ_DIR
-        exit 1
-      fi
-    
-    - echo "✅ Clean successful - binary and objects removed"
+    - echo "Running unit tests..."
+    - make test
+    - echo "Tests completed successfully"
 
-# Rebuild test
-test_rebuild:
-  stage: test
-  <<: *common_setup
-  dependencies:
-    - build_library
-  script:
-    - echo "🧪 Testing make re..."
-    - make re > /dev/null 2>&1
-    
-    - |
-      if [ ! -f "$LIBRARY_NAME" ]; then
-        echo "❌ Binary '$LIBRARY_NAME' not created after make re"
-        exit 1
-      fi
-    
-    - echo "✅ Rebuild successful"
+# lint-test-job:   # This job also runs in the test stage.
+#   stage: test    # It can run at the same time as unit-test-job (in parallel).
+#   script:
+#     - echo "Linting code... This will take about 10 seconds."
+#     - sleep 10
+#     - echo "No lint issues found."
 
-# No unnecessary rebuild test
-test_no_rebuild:
-  stage: test
-  <<: *common_setup
-  dependencies:
-    - build_library
+deploy-job:      # This job runs in the deploy stage.
+  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+  environment: production
   script:
-    - echo "🧪 Testing for unnecessary rebuilds..."
-    - make_output=$(make 2>&1)
-    
-    - |
-      if ! echo "$make_output" | grep -q "Nothing to be done\|up to date" && [ -n "$make_output" ]; then
-        echo "❌ Make unnecessarily rebuilt: $make_output"
-        exit 1
-      fi
-    
-    - echo "✅ No unnecessary rebuild detected"
-
-# Unit tests with Criterion
-test_unit:
-  stage: test
-  <<: *common_setup
-  dependencies:
-    - build_library
-  script:
-    - echo "🧪 Checking for test target..."
-    - |
-      if grep -q "^test:" Makefile 2>/dev/null; then
-        echo "Running unit tests..."
-        make test > test_output.log 2>&1
-        test_exit_code=$?
-        
-        if [ $test_exit_code -ne 0 ]; then
-          echo "❌ Unit tests failed"
-          cat test_output.log
-          exit 1
-        fi
-        
-        echo "✅ Unit tests passed"
-      else
-        echo "⚠️  No test target found in Makefile, skipping..."
-        exit 0
-      fi
-  
-  artifacts:
-    reports:
-      junit: test_output.xml
-    paths:
-      - test_output.log
-    expire_in: 1 week
-    when: always
-  
-  allow_failure: false
-
-# Optional: Code quality checks
-code_quality:
-  stage: test
-  <<: *common_setup
-  dependencies:
-    - build_library
-  script:
-    - echo "🔍 Running code quality checks..."
-    - |
-      if command -v norminette &> /dev/null; then
-        norminette src/ include/ || echo "⚠️  Norminette issues found"
-      else
-        echo "⚠️  Norminette not installed, skipping..."
-      fi
-  allow_failure: true
-  only:
-    - merge_requests
-    - main
+    - echo "Deploying application..."
+    - echo "Application successfully deployed."
