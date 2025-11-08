@@ -3,6 +3,7 @@ services:
     build: .
     volumes:
       - .:/app
-    command: ["bash"]
+    working_dir: /app
+    command: ["make", "test"]
     stdin_open: true
     tty: true
