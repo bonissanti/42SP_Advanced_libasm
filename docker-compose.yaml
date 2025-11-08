@@ -1,0 +1,8 @@
+services:
+  nasm:
+    build: .
+    volumes:
+      - .:/app
+    command: ["bash"]
+    stdin_open: true
+    tty: true
