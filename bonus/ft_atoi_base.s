@@ -82,24 +82,24 @@ handle_hex:
     ret
 
 ft_atoi_base:
-    test rdi, rdi       ; check char *str
-    jz .invalid
+    test rdi, rdi           ; check char *str
+    jz .is_null
 
-    test rsi, rsi       ; check char *base
-    jz .invalid
+    test rsi, rsi           ; check char *base
+    jz .is_null
 
     push r12
     push r13
 
-    mov r12, rdi        ; save *str on r12
-    mov r13, rsi        ; save *base on r13
+    mov r12, rdi            ; save *str on r12
+    mov r13, rsi            ; save *base on r13
 
-    mov rdi, rsi        ; 1st arg = *base
+    mov rdi, rsi            ; 1st arg = *base
     lea rsi, [rel base10]
     call ft_strcmp
     jz .base_10
 
-    mov rdi, r13        ; 2nd arg = *base
+    mov rdi, r13            ; 2nd arg = *base
     lea rsi, [rel base16]
     call ft_strcmp
     jz .base_16
@@ -122,11 +122,11 @@ ft_atoi_base:
     jz .apply_sign
 
     cmp cl, '0'
-    jb .invalid
+    jb .invalid_digit_and_return_result
     cmp cl, '9'
-    ja .invalid
+    ja .invalid_digit_and_return_result
 
-    ; result = result * 10 + (char - '0')
+    ; result = result * 10 +
     imul rax, 10
     sub cl, '0'
     movzx rcx, cl
@@ -184,6 +184,16 @@ ft_atoi_base:
  .invalid:
     pop r13
     pop r12
+    mov rax, 0
+    ret
+
+ .invalid_digit_and_return_result:
+    pop r13
+    pop r12
+    mov rax, rax
+    ret
+
+ .is_null:
     mov rax, 0
     ret
 

@@ -5,7 +5,7 @@
 Test(ft_atoi_base, basic_base10)
 {
     char str[] = "12345";
-    int expected = 12345;
+    int expected = ft_atoi_base_expected(str, "10");;
     int result = ft_atoi_base(str, "10");
 
     cr_assert_eq(result, expected);
