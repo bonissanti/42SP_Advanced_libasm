@@ -1,7 +1,7 @@
 section .text
 global  ft_strdup
 
-extern  malloc
+extern   malloc
 extern  ft_strlen
 extern  ft_strcpy
 

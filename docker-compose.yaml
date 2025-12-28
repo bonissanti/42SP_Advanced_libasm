@@ -1,0 +1,9 @@
+services:
+  nasm:
+    build: .
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: ["make", "test"]
+    stdin_open: true
+    tty: true
