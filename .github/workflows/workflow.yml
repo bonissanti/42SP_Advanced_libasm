@@ -1,0 +1,27 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build libasm
+        run: make
+
+      - name: Rebuild libasm
+        run: make re
+
+      - name: clean
+        run: make clean
+
+      - name: fclean
+        run: make fclean
