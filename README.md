@@ -1,4 +1,4 @@
-# 42SP_Advanced_libsasm
+# 42SP_Advanced_libasm
 
 **General purpose registers (GRPs)**
 
